@@ -34,33 +34,40 @@ const getAllLeads = async (req, res) => {
   try {
 
     const search = req.query.search;
+    const status = req.query.status;
 
     const leads = await prisma.lead.findMany({
 
-      where: search
-        ? {
-            OR: [
-              {
-                name: {
-                  contains: search,
-                  mode: "insensitive"
-                }
-              },
-              {
-                email: {
-                  contains: search,
-                  mode: "insensitive"
-                }
-              },
-              {
-                company: {
-                  contains: search,
-                  mode: "insensitive"
-                }
+      where: {
+
+        ...(search && {
+          OR: [
+            {
+              name: {
+                contains: search,
+                mode: "insensitive"
               }
-            ]
-          }
-        : {},
+            },
+            {
+              email: {
+                contains: search,
+                mode: "insensitive"
+              }
+            },
+            {
+              company: {
+                contains: search,
+                mode: "insensitive"
+              }
+            }
+          ]
+        }),
+
+        ...(status && {
+          status: status
+        })
+
+      },
 
       orderBy: {
         createdAt: "desc"
