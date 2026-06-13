@@ -33,20 +33,51 @@ const createLead = async (req, res) => {
 const getAllLeads = async (req, res) => {
   try {
 
+    const search = req.query.search;
+
     const leads = await prisma.lead.findMany({
+
+      where: search
+        ? {
+            OR: [
+              {
+                name: {
+                  contains: search,
+                  mode: "insensitive"
+                }
+              },
+              {
+                email: {
+                  contains: search,
+                  mode: "insensitive"
+                }
+              },
+              {
+                company: {
+                  contains: search,
+                  mode: "insensitive"
+                }
+              }
+            ]
+          }
+        : {},
+
       orderBy: {
         createdAt: "desc"
       }
+
     });
 
     res.status(200).json(leads);
 
   } catch (error) {
+
     console.error(error);
 
     res.status(500).json({
       message: "Server Error"
     });
+
   }
 };
 
