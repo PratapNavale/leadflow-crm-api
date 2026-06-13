@@ -13,6 +13,14 @@ enum RoleType {
   SALES
 }
 
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -26,15 +34,19 @@ model User {
 }
 
 model Lead {
-  id         Int      @id @default(autoincrement())
+  id         Int         @id @default(autoincrement())
+
   name       String
   email      String
   phone      String?
   company    String?
-  status     String   @default("NEW")
 
-  createdAt  DateTime @default(now())
+  status     LeadStatus  @default(NEW)
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
 
   assignedTo Int?
-  user       User? @relation(fields: [assignedTo], references: [id])
+
+  user       User?       @relation(fields: [assignedTo], references: [id])
 }
