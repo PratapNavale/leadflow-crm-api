@@ -36,38 +36,53 @@ const getAllLeads = async (req, res) => {
     const search = req.query.search;
     const status = req.query.status;
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+
+    const skip = (page - 1) * limit;
+
+    const whereClause = {
+
+      ...(search && {
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            email: {
+              contains: search,
+              mode: "insensitive"
+            }
+          },
+          {
+            company: {
+              contains: search,
+              mode: "insensitive"
+            }
+          }
+        ]
+      }),
+
+      ...(status && {
+        status: status
+      })
+
+    };
+
+    const total = await prisma.lead.count({
+      where: whereClause
+    });
+
     const leads = await prisma.lead.findMany({
 
-      where: {
+      where: whereClause,
 
-        ...(search && {
-          OR: [
-            {
-              name: {
-                contains: search,
-                mode: "insensitive"
-              }
-            },
-            {
-              email: {
-                contains: search,
-                mode: "insensitive"
-              }
-            },
-            {
-              company: {
-                contains: search,
-                mode: "insensitive"
-              }
-            }
-          ]
-        }),
+      skip: skip,
 
-        ...(status && {
-          status: status
-        })
-
-      },
+      take: limit,
 
       orderBy: {
         createdAt: "desc"
@@ -75,7 +90,12 @@ const getAllLeads = async (req, res) => {
 
     });
 
-    res.status(200).json(leads);
+    res.status(200).json({
+      page,
+      limit,
+      total,
+      data: leads
+    });
 
   } catch (error) {
 

@@ -1,3 +1,4 @@
+const dashboardRoutes = require("./routes/dashboardRoutes");
 const express = require("express");
 const cors = require("cors");
 
@@ -19,5 +20,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/leads", leadRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 module.exports = app;
