@@ -5,6 +5,9 @@ const router = express.Router();
 const authenticateToken =
   require("../middleware/authMiddleware");
 
+const authorizeRoles =
+  require("../middleware/roleMiddleware");
+
 const {
   getDashboardStats
 } = require("../controllers/dashboardController");
@@ -12,6 +15,7 @@ const {
 router.get(
   "/stats",
   authenticateToken,
+  authorizeRoles("ADMIN", "MANAGER"),
   getDashboardStats
 );
 
